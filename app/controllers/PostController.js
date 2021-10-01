@@ -1,11 +1,9 @@
-import Post from "../models/Post.js";
+import PostService from "../services/PostService.js";
 
 class PostController {
 	async createPost(req, res) {
 		try {
-			const {author, title, content, img} = req.body;
-			const post = await Post.create({author, title, content, img});
-
+			const post = await PostService.createPost(req.body)
 			res.status(200).json(post)
 		} catch (e) {
 			res.status(500).json(e)
@@ -14,7 +12,7 @@ class PostController {
 
 	async getAllPosts(req, res) {
 		try {
-			const posts = await Post.find();
+			const posts = await PostService.getAllPosts();
 
 			res.status(200).json(posts);
 		} catch (e) {
@@ -25,12 +23,7 @@ class PostController {
 
 	async getPostById(req, res) {
 		try {
-			const {id} = req.params;
-
-			if(!id){
-				res.status(400).json({message:"no ID specified by get"});
-			}
-			const post = await Post.findById(id);
+			const post = await PostService.getPostById(req.params.id)
 
 			res.status(200).json(post);
 		} catch (e) {
@@ -41,30 +34,17 @@ class PostController {
 
 	async updatePost(req, res) {
 		try {
-			const post = req.body;
-
-			if(!post._id){
-				res.status(400).json({message:"no ID specified by update"});
-				return null;
-			}
-			const updatedPost = await Post.findByIdAndUpdate(post._id,post,{new:true});
+			const updatedPost = await PostService.updatePost(req.body);
 
 			res.status(200).json(updatedPost);
 		} catch (e) {
-
-			res.status(500).json(e)
+			res.status(500).json(e.message)
 		}
 	}
 
 	async deletePostById(req, res) {
-		console.log("DELETE IS STARTED")
 		try {
-			const {id} = req.params;
-
-			if(!id){
-				res.status(400).json({message:"no ID specified by delete"});
-			}
-			const post = await Post.findByIdAndDelete(id);
+			const post = await PostService.deletePostById(req.params.id);
 
 			res.status(200).json(post);
 		} catch (e) {
